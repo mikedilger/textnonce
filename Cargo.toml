@@ -1,4 +1,14 @@
 [package]
-name = "nonce"
+name = "textnonce"
 version = "0.1.0"
+description = "Text based random nonce generator"
 authors = ["Mike Dilger <mike@efx.co.nz>"]
+readme = "README.md"
+repository = "https://github.com/mikedilger/textnonce"
+license = "MIT"
+keywords = [ "nonce", "random" ]
+
+[dependencies]
+rand = "*"
+time = "*"
+rustc-serialize = "*"
