@@ -34,7 +34,18 @@ impl TextNonce {
     /// The first 16 characters come from the time component, and all characters
     /// after that will be random.
     pub fn sized(length: usize) -> Result<TextNonce,String> {
+        TextNonce::sized_configured(length, base64::Config {
+            char_set: base64::CharacterSet::Standard,
+            newline: base64::Newline::LF,
+            pad: false,
+            line_length: None
+        })
+    }
 
+    /// Generate a new `TextNonce` specifying the Base64 configuration to use.
+    /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
+    /// from the time component, and all characters after that will be random.
+    pub fn sized_configured(length: usize, config: base64::Config) -> Result<TextNonce,String> {
         if length<16 { return Err("length must be >= 16".to_string()); }
         if length % 4 != 0 { return Err("length must be divisible by 4".to_string()); }
 
@@ -60,12 +71,7 @@ impl TextNonce {
         };
 
         // base64 encode
-        Ok(TextNonce(raw.to_base64( base64::Config {
-            char_set: base64::CharacterSet::Standard,
-            newline: base64::Newline::LF,
-            pad: false,
-            line_length: None
-        } )))
+        Ok(TextNonce(raw.to_base64( config )))
     }
 }
 
