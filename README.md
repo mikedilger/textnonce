@@ -1,5 +1,9 @@
 # TextNonce
 
+[![Build Status](https://travis-ci.org/mikedilger/textnonce.svg?branch=master)](https://travis-ci.org/mikedilger/textnonce)
+
+Documentation is available at https://mikedilger.github.io/textnonce
+
 A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
 
 `TextNonce` is a nonce because the first 16 characters represents the current time, which
