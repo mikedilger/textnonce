@@ -73,6 +73,11 @@ impl TextNonce {
         // base64 encode
         Ok(TextNonce(raw.to_base64( config )))
     }
+
+    pub fn into_string(self) -> String {
+        let TextNonce(s) = self;
+        s
+    }
 }
 
 impl fmt::Display for TextNonce {
