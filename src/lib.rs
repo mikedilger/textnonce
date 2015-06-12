@@ -42,6 +42,18 @@ impl TextNonce {
         })
     }
 
+    /// Generate a new `TextNonce` using the UrlSafe variant of base64 (using '_' and '-')
+    /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
+    /// from the time component, and all characters after that will be random.
+    pub fn sized_urlsafe(length: usize) ->  Result<TextNonce,String> {
+        TextNonce::sized_configured(length, base64::Config {
+            char_set: base64::CharacterSet::UrlSafe,
+            newline: base64::Newline::LF,
+            pad: false,
+            line_length: None
+        })
+    }
+
     /// Generate a new `TextNonce` specifying the Base64 configuration to use.
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
