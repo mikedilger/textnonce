@@ -169,6 +169,18 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class='rust '>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
@@ -208,6 +220,18 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sized</span>(<span class='ident'>length</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>TextNonce</span>,<span class='ident'>String</span><span class='op'>&gt;</span> {
         <span class='ident'>TextNonce</span>::<span class='ident'>sized_configured</span>(<span class='ident'>length</span>, <span class='ident'>base64</span>::<span class='ident'>Config</span> {
             <span class='ident'>char_set</span>: <span class='ident'>base64</span>::<span class='ident'>CharacterSet</span>::<span class='ident'>Standard</span>,
+            <span class='ident'>newline</span>: <span class='ident'>base64</span>::<span class='ident'>Newline</span>::<span class='ident'>LF</span>,
+            <span class='ident'>pad</span>: <span class='boolval'>false</span>,
+            <span class='ident'>line_length</span>: <span class='prelude-val'>None</span>
+        })
+    }
+
+    <span class='doccomment'>/// Generate a new `TextNonce` using the UrlSafe variant of base64 (using &#39;_&#39; and &#39;-&#39;)</span>
+    <span class='doccomment'>/// `length` must be at least 16, and divisible by 4.  The first 16 characters come</span>
+    <span class='doccomment'>/// from the time component, and all characters after that will be random.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sized_urlsafe</span>(<span class='ident'>length</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span>  <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>TextNonce</span>,<span class='ident'>String</span><span class='op'>&gt;</span> {
+        <span class='ident'>TextNonce</span>::<span class='ident'>sized_configured</span>(<span class='ident'>length</span>, <span class='ident'>base64</span>::<span class='ident'>Config</span> {
+            <span class='ident'>char_set</span>: <span class='ident'>base64</span>::<span class='ident'>CharacterSet</span>::<span class='ident'>UrlSafe</span>,
             <span class='ident'>newline</span>: <span class='ident'>base64</span>::<span class='ident'>Newline</span>::<span class='ident'>LF</span>,
             <span class='ident'>pad</span>: <span class='boolval'>false</span>,
             <span class='ident'>line_length</span>: <span class='prelude-val'>None</span>
