@@ -19,7 +19,7 @@ use rustc_serialize::base64::{self,ToBase64};
 /// This makes it suitable to be used for session IDs.
 ///
 /// It is also text-based, using only characters in the base64 character set.
-#[derive(Clone,Debug)]
+#[derive(Clone,PartialEq,Debug)]
 pub struct TextNonce(pub String);
 
 impl TextNonce {
