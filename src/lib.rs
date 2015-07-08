@@ -7,6 +7,7 @@ use std::mem;
 use std::ptr;
 use std::fmt;
 use rand::{OsRng,Rng};
+use std::ops::Deref;
 use rustc_serialize::base64::{self,ToBase64};
 
 /// A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
@@ -95,6 +96,13 @@ impl TextNonce {
 impl fmt::Display for TextNonce {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl Deref for TextNonce {
+    type Target = str;
+    fn deref<'a>(&'a self) -> &'a str {
+        &*self.0
     }
 }
 
