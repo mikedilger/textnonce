@@ -2,7 +2,10 @@
 name = "textnonce"
 version = "0.1.1"
 description = "Text based random nonce generator"
-authors = ["Mike Dilger <mike@efx.co.nz>"]
+authors = [
+        "Mike Dilger <mike@optcomp.nz>",
+        "Konstantin Stepanov <milezv@gmail.com>"
+        ]
 readme = "README.md"
 repository = "https://github.com/mikedilger/textnonce"
 documentation = "https://mikedilger.github.io/textnonce"
