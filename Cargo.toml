@@ -9,7 +9,7 @@ authors = [
 readme = "README.md"
 repository = "https://github.com/mikedilger/textnonce"
 documentation = "https://mikedilger.github.io/textnonce"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
 
 [dependencies]
