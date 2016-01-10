@@ -11,8 +11,14 @@ repository = "https://github.com/mikedilger/textnonce"
 documentation = "https://mikedilger.github.io/textnonce"
 license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
+build = "build.rs"
+
+[build-dependencies]
+serde_codegen = "^0.6"
+syntex = "^0.25"
 
 [dependencies]
 rand = "^0.3"
 time = "^0.1"
 rustc-serialize = "^0.3"
+serde = "^0.6"
