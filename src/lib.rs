@@ -121,7 +121,7 @@ mod tests {
     fn new() {
         // Test 100 nonces:
         let mut map = HashSet::new();
-        for _ in (0..100) {
+        for _ in 0..100 {
             let n = TextNonce::new();
             let TextNonce(s) = n;
 
