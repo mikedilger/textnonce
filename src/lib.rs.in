@@ -61,8 +61,8 @@ impl TextNonce {
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
     pub fn sized_configured(length: usize, config: base64::Config) -> Result<TextNonce,String> {
-        if length<16 { return Err("length must be >= 16".to_string()); }
-        if length % 4 != 0 { return Err("length must be divisible by 4".to_string()); }
+        if length<16 { return Err("length must be >= 16".to_owned()); }
+        if length % 4 != 0 { return Err("length must be divisible by 4".to_owned()); }
 
         let bytelength: usize = (length / 4) * 3;
 
