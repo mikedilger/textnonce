@@ -15,7 +15,7 @@ build = "build.rs"
 
 [build-dependencies]
 serde_codegen = "^0.6"
-syntex = "^0.28"
+syntex = "^0.29"
 
 [dependencies]
 rand = "^0.3"
