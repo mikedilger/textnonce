@@ -8,9 +8,19 @@
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
+#![cfg_attr(not(feature = "with-syntex"), feature(custom_attribute, custom_derive, plugin))]
+#![cfg_attr(not(feature = "with-syntex"), plugin(serde_macros))]
+
 extern crate rand;
 extern crate time;
 extern crate rustc_serialize;
 extern crate serde;
 
+
+#[cfg(not(feature = "with-syntex"))]
+include!("lib.rs.in");
+
+#[cfg(feature = "with-syntex")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));
+
+
