@@ -1,6 +1,6 @@
 [package]
 name = "textnonce"
-version = "0.2.4"
+version = "0.2.5"
 description = "Text based random nonce generator"
 authors = [
         "Mike Dilger <mike@optcomp.nz>",
@@ -13,13 +13,18 @@ license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
 build = "build.rs"
 
+[features]
+default = ["with-syntex"]
+with-syntex = ["syntex", "serde_codegen"]
+
 [build-dependencies]
-serde_codegen = "^0"
-syntex = "^0"
+serde_codegen = { version = "^0", optional = true }
+syntex = { version = "^0", optional = true }
 
 [dependencies]
 rand = "^0.3"
 time = "^0.1"
 rustc-serialize = "^0.3"
 serde = "^0"
+serde_macros = { version = "^0", optional = true }
 clippy = { version = "^0", optional = true }
