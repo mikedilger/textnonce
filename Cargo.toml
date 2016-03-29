@@ -14,8 +14,11 @@ keywords = [ "nonce", "random" ]
 build = "build.rs"
 
 [features]
-default = ["with-syntex"]
-with-syntex = ["syntex", "serde_codegen"]
+default = [ "rust-stable" ]
+rust-stable = [ "serde_codegen", "syntex" ]
+rust-nightly = [ "serde_macros" ]
+# Deprecated feature names:
+with-syntex = [ "rust-stable" ]
 
 [build-dependencies]
 serde_codegen = { version = "0.7", optional = true }
