@@ -11,23 +11,13 @@ repository = "https://github.com/mikedilger/textnonce"
 documentation = "https://mikedilger.github.io/textnonce"
 license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
-build = "build.rs"
 
 [features]
-default = [ "rust-stable" ]
-rust-stable = [ "serde_codegen", "syntex" ]
-rust-nightly = [ "serde_macros" ]
-# Deprecated feature names:
-with-syntex = [ "rust-stable" ]
-
-[build-dependencies]
-serde_codegen = { version = "0.7", optional = true }
-syntex = { version = "0", optional = true }
+default = [ ]
 
 [dependencies]
 rand = "^0.3"
 time = "^0.1"
 rustc-serialize = "^0.3"
-serde = "0.7"
-serde_macros = { version = "0.7", optional = true }
+serde = { version = "0.7", optional = true }
 clippy = { version = "^0", optional = true }
