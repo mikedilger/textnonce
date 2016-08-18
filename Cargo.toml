@@ -15,6 +15,9 @@ keywords = [ "nonce", "random" ]
 [features]
 default = [ ]
 
+[dev-dependencies]
+bincode = "0.6"
+
 [dependencies]
 rand = "^0.3"
 time = "^0.1"
