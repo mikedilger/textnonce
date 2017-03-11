@@ -32,6 +32,7 @@ use rustc_serialize::base64::{self,ToBase64};
 ///
 /// It is also text-based, using only characters in the base64 character set.
 #[derive(Clone, PartialEq, Debug)]
+#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
 pub struct TextNonce(pub String);
 
 impl TextNonce {
@@ -117,50 +118,6 @@ impl Deref for TextNonce {
     }
 }
 
-#[cfg(feature = "serde")]
-impl serde::ser::Serialize for TextNonce {
-    fn serialize<S>(&self, serializer: &mut S)  -> Result<(), S::Error>
-        where S: serde::ser::Serializer
-    {
-        serializer.serialize_newtype_struct("TextNonce", &self.0)
-    }
-}
-
-#[cfg(feature = "serde")]
-impl serde::de::Deserialize for TextNonce {
-    fn deserialize<D>(deserializer: &mut D) -> Result<TextNonce, D::Error>
-        where D: serde::de::Deserializer
-    {
-        struct Visitor<D: serde::de::Deserializer>(::std::marker::PhantomData<D>);
-
-        impl <D: serde::de::Deserializer> serde::de::Visitor for Visitor<D> {
-            type Value = TextNonce;
-
-            #[inline]
-            fn visit_newtype_struct<E>(&mut self, e: &mut E) -> Result<Self::Value, E::Error>
-                where E: serde::de::Deserializer
-            {
-                Ok(TextNonce(try!(<String as serde::Deserialize>::deserialize(e))))
-            }
-
-            #[inline]
-            fn visit_seq<V>(&mut self, mut visitor: V) -> Result<TextNonce, V::Error>
-                where V: serde::de::SeqVisitor
-            {
-                let field0 =  match try!(visitor.visit::<String>()) {
-                    Some(value) => { value },
-                    None => return Err(serde::de::Error::end_of_stream()),
-                };
-                try!(visitor.end());
-                Ok(TextNonce(field0))
-            }
-        }
-
-        deserializer.deserialize_newtype_struct("TextNonce",
-                                                Visitor::<D>(::std::marker::PhantomData))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     extern crate bincode;
@@ -208,9 +165,9 @@ mod tests {
     #[test]
     fn serde() {
         let n = TextNonce::sized(48);
-        let serialized = bincode::serde::serialize(&n, bincode::SizeLimit::Infinite)
+        let serialized = bincode::serialize(&n, bincode::SizeLimit::Infinite)
             .unwrap();
-        let deserialized = bincode::serde::deserialize(&serialized).unwrap();
+        let deserialized = bincode::deserialize(&serialized).unwrap();
         assert_eq!(n, deserialized);
     }
 }
