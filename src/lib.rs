@@ -10,7 +10,7 @@
 
 extern crate rand;
 extern crate time;
-extern crate rustc_serialize;
+extern crate base64;
 #[cfg(feature = "serde")]
 extern crate serde;
 
@@ -19,7 +19,6 @@ use std::ptr;
 use std::fmt;
 use rand::{OsRng,Rng};
 use std::ops::Deref;
-use rustc_serialize::base64::{self,ToBase64};
 
 /// A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
 ///
@@ -47,24 +46,14 @@ impl TextNonce {
     /// The first 16 characters come from the time component, and all characters
     /// after that will be random.
     pub fn sized(length: usize) -> Result<TextNonce,String> {
-        TextNonce::sized_configured(length, base64::Config {
-            char_set: base64::CharacterSet::Standard,
-            newline: base64::Newline::LF,
-            pad: false,
-            line_length: None
-        })
+        TextNonce::sized_configured(length, base64::STANDARD)
     }
 
     /// Generate a new `TextNonce` using the UrlSafe variant of base64 (using '_' and '-')
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
     pub fn sized_urlsafe(length: usize) ->  Result<TextNonce,String> {
-        TextNonce::sized_configured(length, base64::Config {
-            char_set: base64::CharacterSet::UrlSafe,
-            newline: base64::Newline::LF,
-            pad: false,
-            line_length: None
-        })
+        TextNonce::sized_configured(length, base64::URL_SAFE)
     }
 
     /// Generate a new `TextNonce` specifying the Base64 configuration to use.
@@ -96,7 +85,7 @@ impl TextNonce {
         };
 
         // base64 encode
-        Ok(TextNonce(raw.to_base64( config )))
+        Ok(TextNonce(base64::encode_config( &raw, config )))
     }
 
     pub fn into_string(self) -> String {
