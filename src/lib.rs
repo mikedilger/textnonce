@@ -9,7 +9,7 @@
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
 extern crate rand;
-extern crate time;
+extern crate chrono;
 extern crate base64;
 #[cfg(feature = "serde")]
 extern crate serde;
@@ -24,7 +24,7 @@ use std::ops::Deref;
 ///
 /// `TextNonce` is a nonce because the first 16 characters represents the current time, which
 /// will never have been generated before, nor will it be generated again, across the period of
-/// time in which Timespec is valid.
+/// time in which a Timespec (or chrono::DateTime) is valid.
 ///
 /// `TextNonce` additionally includes bytes of randomness, making it difficult to predict.
 /// This makes it suitable to be used for session IDs.
@@ -69,13 +69,17 @@ impl TextNonce {
         unsafe { raw.set_len(bytelength); }
 
         // Get the first 12 bytes from the current time
-        // (Timespec is actually 16 due to alignment, but we will only use 12)
-        // Big-endian and Little-endian machines will have these in different orders,
-        // However this is not of any concern to us.
-        let time = ::time::get_time();
-        unsafe {
-            let timep: *const u8 = mem::transmute(&time);
-            ptr::copy_nonoverlapping(timep, raw.as_mut_ptr(), 12);
+        {
+            let now = chrono::UTC::now();
+            let secs: i64 = now.timestamp();
+            let nsecs: u32 = now.timestamp_subsec_nanos();
+            // Big-endian and Little-endian machines will have these in different orders.
+            unsafe {
+                let p: *const u8 = mem::transmute(&nsecs);
+                ptr::copy_nonoverlapping(p, raw.as_mut_ptr(), 4);
+                let p: *const u8 = mem::transmute(&secs);
+                ptr::copy_nonoverlapping(p, raw.as_mut_ptr().offset(4), 8);
+            }
         }
 
         // Get the last bytes from random data
@@ -130,6 +134,8 @@ mod tests {
                         .filter(|x| { x.is_digit(10) || x.is_alphabetic() || *x=='+' || *x=='/' })
                         .count(),
                         32 );
+
+            println!("{}", s);
 
             // Add to the map
             map.insert(s);
