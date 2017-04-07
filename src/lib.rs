@@ -10,16 +10,16 @@
 
 extern crate rand;
 extern crate chrono;
+extern crate byteorder;
 extern crate base64;
 #[cfg(feature = "serde")]
 extern crate serde;
 
-use std::mem;
-use std::ptr;
 use std::fmt;
+use std::io::Cursor;
 use rand::{OsRng,Rng};
 use std::ops::Deref;
-
+use byteorder::{LittleEndian, WriteBytesExt};
 /// A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
 ///
 /// `TextNonce` is a nonce because the first 16 characters represents the current time, which
@@ -73,13 +73,10 @@ impl TextNonce {
             let now = chrono::UTC::now();
             let secs: i64 = now.timestamp();
             let nsecs: u32 = now.timestamp_subsec_nanos();
-            // Big-endian and Little-endian machines will have these in different orders.
-            unsafe {
-                let p: *const u8 = mem::transmute(&nsecs);
-                ptr::copy_nonoverlapping(p, raw.as_mut_ptr(), 4);
-                let p: *const u8 = mem::transmute(&secs);
-                ptr::copy_nonoverlapping(p, raw.as_mut_ptr().offset(4), 8);
-            }
+
+            let mut cursor = Cursor::new(&mut *raw);
+            cursor.write_u32::<LittleEndian>(nsecs).unwrap();
+            cursor.write_i64::<LittleEndian>(secs).unwrap();
         }
 
         // Get the last bytes from random data
@@ -134,8 +131,6 @@ mod tests {
                         .filter(|x| { x.is_digit(10) || x.is_alphabetic() || *x=='+' || *x=='/' })
                         .count(),
                         32 );
-
-            println!("{}", s);
 
             // Add to the map
             map.insert(s);
