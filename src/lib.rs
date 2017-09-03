@@ -70,7 +70,7 @@ impl TextNonce {
 
         // Get the first 12 bytes from the current time
         {
-            let now = chrono::UTC::now();
+            let now = chrono::Utc::now();
             let secs: i64 = now.timestamp();
             let nsecs: u32 = now.timestamp_subsec_nanos();
 
