@@ -110,8 +110,6 @@ impl Deref for TextNonce {
 
 #[cfg(test)]
 mod tests {
-    extern crate bincode;
-
     use super::TextNonce;
     use std::collections::HashSet;
 
@@ -155,7 +153,7 @@ mod tests {
     #[test]
     fn serde() {
         let n = TextNonce::sized(48);
-        let serialized = bincode::serialize(&n, bincode::SizeLimit::Infinite)
+        let serialized = bincode::serialize(&n, bincode::Infinite)
             .unwrap();
         let deserialized = bincode::deserialize(&serialized).unwrap();
         assert_eq!(n, deserialized);
