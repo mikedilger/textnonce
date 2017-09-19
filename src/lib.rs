@@ -24,13 +24,13 @@ use byteorder::{LittleEndian, WriteBytesExt};
 ///
 /// `TextNonce` is a nonce because the first 16 characters represents the current time, which
 /// will never have been generated before, nor will it be generated again, across the period of
-/// time in which a Timespec (or chrono::DateTime) is valid.
+/// time in which a `Timespec` (or `chrono::DateTime`) is valid.
 ///
 /// `TextNonce` additionally includes bytes of randomness, making it difficult to predict.
 /// This makes it suitable to be used for session IDs.
 ///
 /// It is also text-based, using only characters in the base64 character set.
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Default)]
 #[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
 pub struct TextNonce(pub String);
 
@@ -49,7 +49,7 @@ impl TextNonce {
         TextNonce::sized_configured(length, base64::STANDARD)
     }
 
-    /// Generate a new `TextNonce` using the UrlSafe variant of base64 (using '_' and '-')
+    /// Generate a new `TextNonce` using the `URL_SAFE` variant of base64 (using '_' and '-')
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
     pub fn sized_urlsafe(length: usize) ->  Result<TextNonce,String> {
@@ -103,7 +103,7 @@ impl fmt::Display for TextNonce {
 
 impl Deref for TextNonce {
     type Target = str;
-    fn deref<'a>(&'a self) -> &'a str {
+    fn deref(&self) -> &str {
         &*self.0
     }
 }
