@@ -13,7 +13,8 @@ extern crate chrono;
 extern crate byteorder;
 extern crate base64;
 #[cfg(feature = "serde")]
-extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 
 use std::fmt;
 use std::io::Cursor;
@@ -112,6 +113,9 @@ impl Deref for TextNonce {
 mod tests {
     use super::TextNonce;
     use std::collections::HashSet;
+
+    #[cfg(feature = "serde")]
+    extern crate bincode;
 
     #[test]
     fn new() {
