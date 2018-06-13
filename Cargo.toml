@@ -15,7 +15,7 @@ bincode = "0.8"
 [dependencies]
 rand = "0.5"
 chrono = "0.4"
-byteorder = "1.1"
+byteorder = "1.2"
 base64 = "0.6"
 serde = "1.0"
 serde_derive = "1.0"
