@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mikedilger/textnonce.svg?branch=master)](https://travis-ci.org/mikedilger/textnonce)
 
-Documentation is available at https://mikedilger.github.io/textnonce
+Documentation is available at https://docs.rs/textnonce
 
 A nonce is a cryptographic concept of an arbitrary number that is never used
 more than once.

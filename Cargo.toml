@@ -5,7 +5,7 @@ description = "Text based random nonce generator"
 authors = [ "Mike Dilger <mike@optcomp.nz>" ]
 readme = "README.md"
 repository = "https://github.com/mikedilger/textnonce"
-documentation = "https://mikedilger.github.io/textnonce"
+documentation = "https://docs.rs/textnonce"
 license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
 
