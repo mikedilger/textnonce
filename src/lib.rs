@@ -9,7 +9,6 @@ extern crate base64;
 extern crate byteorder;
 extern crate chrono;
 extern crate rand;
-#[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde_derive;
 
@@ -28,8 +27,7 @@ use std::ops::Deref;
 /// This makes it suitable to be used for session IDs.
 ///
 /// It is also text-based, using only characters in the base64 character set.
-#[derive(Clone, PartialEq, Debug, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TextNonce(pub String);
 
 impl TextNonce {
@@ -116,7 +114,6 @@ mod tests {
     use super::TextNonce;
     use std::collections::HashSet;
 
-    #[cfg(feature = "serde")]
     extern crate bincode;
 
     #[test]
@@ -157,7 +154,6 @@ mod tests {
         assert!(n.is_err());
     }
 
-    #[cfg(feature = "serde")]
     #[test]
     fn serde() {
         let n = TextNonce::sized(48);
