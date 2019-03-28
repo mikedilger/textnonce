@@ -13,7 +13,8 @@ extern crate rand;
 extern crate serde_derive;
 
 use byteorder::{LittleEndian, WriteBytesExt};
-use rand::{OsRng, RngCore};
+use rand::RngCore;
+use rand::rngs::OsRng;
 use std::fmt;
 use std::io::Cursor;
 use std::ops::Deref;
