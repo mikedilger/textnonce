@@ -158,7 +158,7 @@ mod tests {
     #[test]
     fn serde() {
         let n = TextNonce::sized(48);
-        let serialized = bincode::serialize(&n, bincode::Infinite).unwrap();
+        let serialized = bincode::serialize(&n).unwrap();
         let deserialized = bincode::deserialize(&serialized).unwrap();
         assert_eq!(n, deserialized);
     }

@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
 
 [dev-dependencies]
-bincode = "0.8"
+bincode = "1.1"
 
 [dependencies]
 rand = "0.6"
