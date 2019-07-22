@@ -13,8 +13,8 @@ extern crate rand;
 extern crate serde_derive;
 
 use byteorder::{LittleEndian, WriteBytesExt};
-use rand::RngCore;
 use rand::rngs::OsRng;
+use rand::RngCore;
 use std::fmt;
 use std::io::Cursor;
 use std::ops::Deref;
@@ -66,9 +66,7 @@ impl TextNonce {
         let bytelength: usize = (length / 4) * 3;
 
         let mut raw: Vec<u8> = Vec::with_capacity(bytelength);
-        unsafe {
-            raw.set_len(bytelength);
-        }
+        raw.resize(bytelength, 0);
 
         // Get the first 12 bytes from the current time
         {
