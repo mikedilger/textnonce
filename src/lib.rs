@@ -60,8 +60,7 @@ impl TextNonce {
 
         let bytelength: usize = (length / 4) * 3;
 
-        let mut raw: Vec<u8> = Vec::with_capacity(bytelength);
-        raw.resize(bytelength, 0);
+        let mut raw: Vec<u8> = vec![0; bytelength];
 
         // Get the first 12 bytes from the current time
         {
