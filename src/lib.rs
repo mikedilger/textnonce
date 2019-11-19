@@ -9,15 +9,16 @@ extern crate base64;
 extern crate byteorder;
 extern crate chrono;
 extern crate rand;
-#[macro_use]
-extern crate serde_derive;
+extern crate serde;
 
 use byteorder::{LittleEndian, WriteBytesExt};
 use rand::rngs::OsRng;
 use rand::RngCore;
+use serde::{Serialize, Deserialize};
 use std::fmt;
 use std::io::Cursor;
 use std::ops::Deref;
+
 /// A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
 ///
 /// `TextNonce` is a nonce because the first 16 characters represents the current time, which
