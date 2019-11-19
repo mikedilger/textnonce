@@ -1,6 +1,6 @@
 [package]
 name = "textnonce"
-version = "0.7.0"
+version = "0.8.0-pre"
 description = "Text based random nonce generator"
 authors = [ "Mike Dilger <mike@optcomp.nz>" ]
 readme = "README.md"
