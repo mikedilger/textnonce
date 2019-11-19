@@ -80,10 +80,8 @@ impl TextNonce {
         }
 
         // Get the last bytes from random data
-        match OsRng::new() {
-            Ok(mut g) => g.fill_bytes(&mut raw[12..bytelength]),
-            Err(_) => ::rand::thread_rng().fill_bytes(&mut raw[12..bytelength]),
-        };
+
+        OsRng.fill_bytes(&mut raw[12..bytelength]);
 
         // base64 encode
         Ok(TextNonce(base64::encode_config(&raw, config)))
