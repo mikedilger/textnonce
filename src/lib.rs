@@ -5,12 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-extern crate base64;
-extern crate byteorder;
-extern crate chrono;
-extern crate rand;
-extern crate serde;
-
 use byteorder::{LittleEndian, WriteBytesExt};
 use rand::rngs::OsRng;
 use rand::RngCore;

@@ -8,6 +8,7 @@ repository = "https://github.com/mikedilger/textnonce"
 documentation = "https://docs.rs/textnonce"
 license = "MIT OR Apache-2.0"
 keywords = [ "nonce", "random" ]
+edition = "2018"
 
 [dev-dependencies]
 bincode = "1.2"
