@@ -5,6 +5,27 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! A nonce is a cryptographic concept of an arbitrary number that is never used
+//! more than once.
+//!
+//! `TextNonce` is a nonce because the first 16 characters represents the current
+//! time, which will never have been generated before, nor will it be generated
+//! again, across the period of time in which Timespec is valid.
+//!
+//! `TextNonce` additionally includes bytes of randomness, making it difficult
+//! to predict. This makes it suitable to be used for a session ID.
+//!
+//! It is also text-based, using only characters in the base64 character set.
+//!
+//! Various length `TextNonce`es may be generated.  The minimum length is 16
+//! characters, and lengths must be evenly divisible by 4.
+
+#![deny(missing_debug_implementations, trivial_casts, trivial_numeric_casts,
+        unused_import_braces, unused_qualifications, unused_results, unused_lifetimes,
+        unused_labels, unused_extern_crates, non_ascii_idents, keyword_idents,
+        deprecated_in_future, unstable_features, single_use_lifetimes, unsafe_code,
+        unreachable_pub, missing_docs, missing_copy_implementations)]
+
 use byteorder::{LittleEndian, WriteBytesExt};
 use rand::rngs::OsRng;
 use rand::RngCore;
@@ -81,6 +102,7 @@ impl TextNonce {
         Ok(TextNonce(base64::encode_config(&raw, config)))
     }
 
+    /// Convert into a string
     pub fn into_string(self) -> String {
         let TextNonce(s) = self;
         s
@@ -104,8 +126,7 @@ impl Deref for TextNonce {
 mod tests {
     use super::TextNonce;
     use std::collections::HashSet;
-
-    extern crate bincode;
+    use bincode;
 
     #[test]
     fn new() {
@@ -127,7 +148,7 @@ mod tests {
             );
 
             // Add to the map
-            map.insert(s);
+            let _ = map.insert(s);
         }
         assert_eq!(map.len(), 100);
     }
