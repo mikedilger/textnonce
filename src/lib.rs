@@ -26,25 +26,25 @@
         deprecated_in_future, unstable_features, single_use_lifetimes, unsafe_code,
         unreachable_pub, missing_docs, missing_copy_implementations)]
 
-use byteorder::{LittleEndian, WriteBytesExt};
 use rand::rngs::OsRng;
 use rand::RngCore;
-use serde::{Serialize, Deserialize};
 use std::fmt;
 use std::io::Cursor;
 use std::ops::Deref;
+use std::io::Write;
 
 /// A nonce is a cryptographic concept of an arbitrary number that is never used more than once.
 ///
 /// `TextNonce` is a nonce because the first 16 characters represents the current time, which
 /// will never have been generated before, nor will it be generated again, across the period of
-/// time in which a `Timespec` (or `chrono::DateTime`) is valid.
+/// time in which a `Timespec` (or `std::time::Duration`, counting from the UNIX epoch) is valid.
 ///
 /// `TextNonce` additionally includes bytes of randomness, making it difficult to predict.
 /// This makes it suitable to be used for session IDs.
 ///
 /// It is also text-based, using only characters in the base64 character set.
-#[derive(Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug, Default)]
+#[cfg_attr(feature ="serde", derive(Serialize, Deserialize))]
 pub struct TextNonce(pub String);
 
 impl TextNonce {
@@ -85,13 +85,14 @@ impl TextNonce {
 
         // Get the first 12 bytes from the current time
         {
-            let now = chrono::Utc::now();
-            let secs: i64 = now.timestamp();
-            let nsecs: u32 = now.timestamp_subsec_nanos();
+            let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)
+                .map_err(|_| "creating nonces from before UNIX epoch not supported".to_string())?;
+            let secs: u64 = now.as_secs();
+            let nsecs: u32 = now.subsec_nanos();
 
             let mut cursor = Cursor::new(&mut *raw);
-            cursor.write_u32::<LittleEndian>(nsecs).unwrap();
-            cursor.write_i64::<LittleEndian>(secs).unwrap();
+            cursor.write_all(&nsecs.to_le_bytes()).unwrap();
+            cursor.write_all(&secs.to_le_bytes()).unwrap();
         }
 
         // Get the last bytes from random data
@@ -126,7 +127,6 @@ impl Deref for TextNonce {
 mod tests {
     use super::TextNonce;
     use std::collections::HashSet;
-    use bincode;
 
     #[test]
     fn new() {
@@ -166,8 +166,12 @@ mod tests {
         assert!(n.is_err());
     }
 
+    #[cfg(feature = "serde")]
     #[test]
     fn serde() {
+        use bincode;
+        use serde::{Serialize, Deserialize};
+
         let n = TextNonce::sized(48);
         let serialized = bincode::serialize(&n).unwrap();
         let deserialized = bincode::deserialize(&serialized).unwrap();
