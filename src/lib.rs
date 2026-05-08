@@ -21,18 +21,55 @@
 //! Various length `TextNonce`es may be generated.  The minimum length is 16
 //! characters, and lengths must be evenly divisible by 4.
 
-#![deny(missing_debug_implementations, trivial_casts, trivial_numeric_casts,
-        unused_import_braces, unused_qualifications, unused_results, unused_lifetimes,
-        unused_labels, unused_extern_crates, non_ascii_idents, keyword_idents,
-        deprecated_in_future, unstable_features, single_use_lifetimes, unsafe_code,
-        unreachable_pub, missing_docs, missing_copy_implementations)]
+#![deny(
+    missing_debug_implementations,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_import_braces,
+    unused_qualifications,
+    unused_results,
+    unused_lifetimes,
+    unused_labels,
+    unused_extern_crates,
+    non_ascii_idents,
+    keyword_idents,
+    deprecated_in_future,
+    unstable_features,
+    single_use_lifetimes,
+    unsafe_code,
+    unreachable_pub,
+    missing_docs,
+    missing_copy_implementations
+)]
 
+use base64::engine::Engine;
 use rand::rngs::SysRng;
 use rand::TryRng;
 use std::fmt;
 use std::io::Cursor;
-use std::ops::Deref;
 use std::io::Write;
+use std::ops::Deref;
+
+/// Pre-defined Alphabets for base64 encoding
+pub mod alphabet {
+    /// The standard alphabet (with + and /) specified in RFC 4648.
+    pub const STANDARD: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    /// The URL-safe alphabet (with - and _) specified in RFC 4648.
+    pub const URL_SAFE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+    /// The crypt(3) alphabet (with . and / as the first two characters).
+    pub const CRYPT: &str = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    /// The bcrypt alphabet.
+    pub const BCRYPT: &str = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    /// The alphabet used in IMAP-modified UTF-7 (with + and ,).
+    pub const IMAP_MUTF7: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,";
+
+    /// The alphabet used in BinHex 4.0 files.
+    pub const BIN_HEX: &str = "!\"#$%&'()*+,-012345689@ABCDEFGHIJKLMNPQRSTUVXYZ[`abcdefhijklmpqr";
+}
 
 /// A nonce is a cryptographic concept of an arbitrary number that is never used
 /// more than once.
@@ -50,7 +87,7 @@ use std::io::Write;
 /// Various length `TextNonce`es may be generated.  The minimum length is 16
 /// characters, and lengths must be evenly divisible by 4.
 #[derive(Clone, PartialEq, Debug, Default)]
-#[cfg_attr(feature ="serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextNonce(pub String);
 
 impl TextNonce {
@@ -64,34 +101,38 @@ impl TextNonce {
     /// The first 16 characters come from the time component, and all characters
     /// after that will be random.
     pub fn sized(length: usize) -> Result<TextNonce, String> {
-        TextNonce::sized_configured(length, base64::STANDARD)
+        TextNonce::custom(length, alphabet::STANDARD)
     }
 
     /// Generate a new `TextNonce` using the `URL_SAFE` variant of base64 (using '_' and '-')
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
     pub fn sized_urlsafe(length: usize) -> Result<TextNonce, String> {
-        TextNonce::sized_configured(length, base64::URL_SAFE)
+        TextNonce::custom(length, alphabet::URL_SAFE)
     }
 
-    /// Generate a new `TextNonce` specifying the Base64 configuration to use.
-    /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
-    /// from the time component, and all characters after that will be random.
-    pub fn sized_configured(length: usize, config: base64::Config) -> Result<TextNonce, String> {
+    /// Generate a custom `TextNonce` specifying the length and alphabet
+    ///
+    /// `length` must be at least 16 and divisible by 4.
+    ///
+    /// `alphabet` must be 64 distinct printable ASCII characters (excluding = and DEL).
+    /// You can use any of the constants we define in the `alphabet` module.
+    pub fn custom(length: usize, alphabet: &str) -> Result<TextNonce, String> {
         if length < 16 {
             return Err("length must be >= 16".to_owned());
         }
-        if length % 4 != 0 {
+        if !length.is_multiple_of(4) {
             return Err("length must be divisible by 4".to_owned());
         }
-
         let bytelength: usize = (length / 4) * 3;
+        let alphabet = base64::alphabet::Alphabet::new(alphabet).map_err(|e| format!("{e}"))?;
 
         let mut raw: Vec<u8> = vec![0; bytelength];
 
         // Get the first 12 bytes from the current time
         {
-            let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
                 .map_err(|_| "creating nonces from before UNIX epoch not supported".to_string())?;
             let secs: u64 = now.as_secs();
             let nsecs: u32 = now.subsec_nanos();
@@ -107,8 +148,11 @@ impl TextNonce {
             .try_fill_bytes(&mut raw[12..bytelength])
             .map_err(|e| format!("failed to obtain random bytes: {e}"))?;
 
+        let engine =
+            base64::engine::GeneralPurpose::new(&alphabet, base64::engine::general_purpose::NO_PAD);
+
         // base64 encode
-        Ok(TextNonce(base64::encode_config(&raw, config)))
+        Ok(TextNonce(engine.encode(&raw)))
     }
 
     /// Convert into a string
@@ -127,7 +171,7 @@ impl fmt::Display for TextNonce {
 impl Deref for TextNonce {
     type Target = str;
     fn deref(&self) -> &str {
-        &*self.0
+        &self.0
     }
 }
 
@@ -178,11 +222,21 @@ mod tests {
     #[test]
     fn serde() {
         use bincode;
-        use serde::{Serialize, Deserialize};
+        use serde::{Deserialize, Serialize};
 
         let n = TextNonce::sized(48);
         let serialized = bincode::serialize(&n).unwrap();
         let deserialized = bincode::deserialize(&serialized).unwrap();
         assert_eq!(n, deserialized);
+    }
+
+    #[test]
+    fn test_alphabets() {
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::STANDARD).is_ok());
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::URL_SAFE).is_ok());
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::CRYPT).is_ok());
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::BCRYPT).is_ok());
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::IMAP_MUTF7).is_ok());
+        assert!(base64::alphabet::Alphabet::new(crate::alphabet::BIN_HEX).is_ok());
     }
 }
