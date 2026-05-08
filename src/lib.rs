@@ -27,6 +27,7 @@
         deprecated_in_future, unstable_features, single_use_lifetimes, unsafe_code,
         unreachable_pub, missing_docs, missing_copy_implementations)]
 
+use base64::engine::general_purpose::{STANDARD, URL_SAFE};
 use rand::rngs::OsRng;
 use rand::RngCore;
 use std::fmt;
@@ -64,20 +65,20 @@ impl TextNonce {
     /// The first 16 characters come from the time component, and all characters
     /// after that will be random.
     pub fn sized(length: usize) -> Result<TextNonce, String> {
-        TextNonce::sized_configured(length, base64::STANDARD)
+        TextNonce::sized_configured(length, &STANDARD)
     }
 
     /// Generate a new `TextNonce` using the `URL_SAFE` variant of base64 (using '_' and '-')
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
     pub fn sized_urlsafe(length: usize) -> Result<TextNonce, String> {
-        TextNonce::sized_configured(length, base64::URL_SAFE)
+        TextNonce::sized_configured(length, &URL_SAFE)
     }
 
-    /// Generate a new `TextNonce` specifying the Base64 configuration to use.
+    /// Generate a new `TextNonce` specifying the Base64 engine to use.
     /// `length` must be at least 16, and divisible by 4.  The first 16 characters come
     /// from the time component, and all characters after that will be random.
-    pub fn sized_configured(length: usize, config: base64::Config) -> Result<TextNonce, String> {
+    pub fn sized_configured<E: base64::Engine>(length: usize, engine: &E) -> Result<TextNonce, String> {
         if length < 16 {
             return Err("length must be >= 16".to_owned());
         }
@@ -106,7 +107,7 @@ impl TextNonce {
         OsRng.fill_bytes(&mut raw[12..bytelength]);
 
         // base64 encode
-        Ok(TextNonce(base64::encode_config(&raw, config)))
+        Ok(TextNonce(engine.encode(&raw)))
     }
 
     /// Convert into a string
