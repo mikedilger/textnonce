@@ -27,8 +27,8 @@
         deprecated_in_future, unstable_features, single_use_lifetimes, unsafe_code,
         unreachable_pub, missing_docs, missing_copy_implementations)]
 
-use rand::rngs::OsRng;
-use rand::RngCore;
+use rand::rngs::SysRng;
+use rand::TryRng;
 use std::fmt;
 use std::io::Cursor;
 use std::ops::Deref;
@@ -103,7 +103,9 @@ impl TextNonce {
 
         // Get the last bytes from random data
 
-        OsRng.fill_bytes(&mut raw[12..bytelength]);
+        SysRng
+            .try_fill_bytes(&mut raw[12..bytelength])
+            .map_err(|e| format!("failed to obtain random bytes: {e}"))?;
 
         // base64 encode
         Ok(TextNonce(base64::encode_config(&raw, config)))
